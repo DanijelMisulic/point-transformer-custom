@@ -11,6 +11,7 @@ Additional changes:
 
 To run everything firstly create conda environment: <br/>
 conda create --name point_transformer python=3.6 <br/>
+conda activate point_transformer  <br/>
 pip install requirements.txt
 
 If you want to run tensorboard, position yourself to dir: log/cls/Hengshuang/output/point_transformer_Hengshuang and run: <br/>
