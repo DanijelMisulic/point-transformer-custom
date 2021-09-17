@@ -1,7 +1,7 @@
 # Point transformer for classification
 
 Most of the code was taken from this repo: https://github.com/qq456cvb/Point-Transformers 
-First step is to download  ModelNet <a href="https://shapenet.cs.stanford.edu/media/modelnet40_normal_resampled.zip"> and save in modelnet40_normal_resampled.
+First step is to download  ModelNet <a href="https://shapenet.cs.stanford.edu/media/modelnet40_normal_resampled.zip">here</a> and save in modelnet40_normal_resampled.
 
 
 
