@@ -15,6 +15,7 @@ Additional changes:
 
 To do: 
 - saving in onnx format suitable for conversion to other formats
+- add additional metrics(precision, recall)
 
 To run everything firstly create conda environment: <br/>
 <b>conda create --name point_transformer python=3.6 </b><br/>
