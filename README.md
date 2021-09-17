@@ -11,6 +11,7 @@ Initial changes:
 Additional changes:
 - added tensorboard for training monitoring
 - added early stopping for training loop
+- added hard negative mining (repeating batch with biggest loss out of 50 batches)
 - added requirements.txt for conda env
 
 To do: 
