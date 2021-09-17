@@ -9,7 +9,12 @@ Initial changes:
 Additional changes:
 - added tensorboard for training monitoring
 
-To run everything firstly create conda environment:
+To run everything firstly create conda environment: <br/>
 conda create --name point_transformer python=3.6 <br/>
 pip install requirements.txt
+
+If you want to run tensorboard, position yourself to dir: log/cls/Hengshuang/output/point_transformer_Hengshuang and run: <br/>
+tensorboard --logdir . <br/>
+and open tensorboard on this address: <br/>
+http://localhost:6006/
 
