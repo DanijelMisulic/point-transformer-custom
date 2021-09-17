@@ -115,7 +115,6 @@ def main(args):
             
             pred = classifier(points)
             loss = criterion(pred, target.long())
-            print (loss.item())
             tb.add_scalar('train_loss_per_batch', loss.item(), global_step)
         
             pred_choice = pred.data.max(1)[1]
