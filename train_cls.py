@@ -1,4 +1,5 @@
 from dataset import ModelNetDataLoader
+from pointnet_util import EarlyStopping
 import numpy as np
 import os
 import torch
@@ -90,6 +91,8 @@ def main(args):
     tb = SummaryWriter(f'./output/{MODEL_NAME}')
     if not os.path.exists(f'./output/{MODEL_NAME}/'):
         os.makedirs(f'./output/{MODEL_NAME}/')
+        
+    es = EarlyStopping(patience=5)
     
     for epoch in range(start_epoch,args.epoch):
         print ('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
@@ -120,6 +123,7 @@ def main(args):
             optimizer.step()
             global_step += 1
             
+            
         scheduler.step()
 
         train_instance_acc = np.mean(mean_correct)
@@ -140,9 +144,14 @@ def main(args):
 
             if (class_acc >= best_class_acc):
                 best_class_acc = class_acc
+            
             print ("Test Instance Accuracy: %f, Class Accuracy: %f"% (instance_acc, class_acc))
             print ("Best Instance Accuracy: %f, Class Accuracy: %'% (best_instance_acc, best_class_acc)")
-
+            
+            if es.step(train_instance_acc):
+                print ("Early stopping...")
+                break
+            
             if (instance_acc >= best_instance_acc):
                 print ("Saving model")
                 savepath = 'best_model.pth'
