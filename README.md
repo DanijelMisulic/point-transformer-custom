@@ -13,6 +13,9 @@ Additional changes:
 - added early stopping for training loop
 - added requirements.txt for conda env
 
+To do: 
+- saving in onnx format suitable for conversion to other formats
+
 To run everything firstly create conda environment: <br/>
 <b>conda create --name point_transformer python=3.6 </b><br/>
 <b>conda activate point_transformer </b> <br/>
