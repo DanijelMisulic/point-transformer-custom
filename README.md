@@ -8,6 +8,7 @@ Initial changes:
 
 Additional changes:
 - added tensorboard for training monitoring
+- added early stopping for training loop
 - added requirements.txt for conda env
 
 To run everything firstly create conda environment: <br/>
