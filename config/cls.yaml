@@ -1,5 +1,5 @@
 batch_size: 16
-epoch: 200
+epoch: 50
 learning_rate: 1e-3
 gpu: 1
 num_point: 1024
