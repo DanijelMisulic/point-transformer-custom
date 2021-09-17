@@ -8,6 +8,7 @@ import importlib
 import shutil
 import hydra
 import omegaconf
+from torch.utils.tensorboard import SummaryWriter
 
 
 def test(model, loader, device, num_class=40):
@@ -85,6 +86,11 @@ def main(args):
     mean_correct = []
 
     print ("Training started")
+    
+    tb = SummaryWriter(f'./output/{MODEL_NAME}')
+    if not os.path.exists(f'./output/{MODEL_NAME}/'):
+        os.makedirs(f'./output/{MODEL_NAME}/')
+    
     for epoch in range(start_epoch,args.epoch):
         print ('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
         
@@ -103,7 +109,10 @@ def main(args):
 
             pred = classifier(points)
             loss = criterion(pred, target.long())
-            print (loss)
+            print (loss.item())
+            tb.add_scalar('train_loss_per_batch', loss.item(), epoch + batch_id)
+            
+            
             pred_choice = pred.data.max(1)[1]
             correct = pred_choice.eq(target.long().data).to(device).sum()
             mean_correct.append(correct.item() / float(points.size()[0]))
@@ -114,10 +123,16 @@ def main(args):
         scheduler.step()
 
         train_instance_acc = np.mean(mean_correct)
+        tb.add_scalar('train_accuracy_per_epoch', train_instance_acc, epoch)
+        tb.add_scalar('lr', optimizer.param_groups[0]["lr"], epoch)
+
+
         print ("Train Instance Accuracy: %f" % train_instance_acc)
 
         with torch.no_grad():
             instance_acc, class_acc = test(classifier.eval(), testDataLoader, device)
+            tb.add_scalar('test_accuracy_per_epoch', instance_acc, epoch)
+
 
             if (instance_acc >= best_instance_acc):
                 best_instance_acc = instance_acc
