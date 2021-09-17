@@ -8,9 +8,10 @@ Initial changes:
 
 Additional changes:
 - added tensorboard for training monitoring
+- added requirements.txt for conda env
 
 To run everything firstly create conda environment: <br/>
-conda create --name point_transformer python=3.6 <br/>
+<b>conda create --name point_transformer python=3.6 </b><br/>
 conda activate point_transformer  <br/>
 pip install -r requirements.txt <br/>
 Then cd to the root directory and run: <br/>
