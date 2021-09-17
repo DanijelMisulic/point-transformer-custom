@@ -36,6 +36,8 @@ def test(model, loader, device, num_class=40):
 
 @hydra.main(config_path='config', config_name='cls')
 def main(args):
+    print (args.epoch)
+
     MODEL_NAME = 'point_transformer_Hengshuang'
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -85,6 +87,7 @@ def main(args):
     best_class_acc = 0.0
     best_epoch = 0
     mean_correct = []
+    worst_batch_loss = -np.inf
 
     print ("Training started")
     
@@ -93,13 +96,13 @@ def main(args):
         os.makedirs(f'./output/{MODEL_NAME}/')
         
     es = EarlyStopping(patience=5)
-    
     for epoch in range(start_epoch,args.epoch):
         print ('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
         
         classifier.train()
         for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
             points, target = data
+            
             points = points.data.numpy()
             points = provider.random_point_dropout(points)
             points[:,:, 0:3] = provider.random_scale_point_cloud(points[:,:, 0:3])
@@ -109,13 +112,12 @@ def main(args):
 
             points, target = points.to(device), target.to(device)
             optimizer.zero_grad()
-
+            
             pred = classifier(points)
             loss = criterion(pred, target.long())
             print (loss.item())
-            tb.add_scalar('train_loss_per_batch', loss.item(), epoch + batch_id)
-            
-            
+            tb.add_scalar('train_loss_per_batch', loss.item(), global_step)
+        
             pred_choice = pred.data.max(1)[1]
             correct = pred_choice.eq(target.long().data).to(device).sum()
             mean_correct.append(correct.item() / float(points.size()[0]))
@@ -123,13 +125,29 @@ def main(args):
             optimizer.step()
             global_step += 1
             
+            if loss > worst_batch_loss:
+                worst_batch_loss = loss
+                worst_batch_input = points
+                
+            #repeating worst out of 50 batches
+            if batch_id != 0 and batch_id%50 == 0:
+                pred = classifier(worst_batch_input)
+                loss = criterion(pred, target.long())
+                tb.add_scalar('train_loss_per_batch', loss.item(), global_step)
+            
+                pred_choice = pred.data.max(1)[1]
+                correct = pred_choice.eq(target.long().data).to(device).sum()
+                mean_correct.append(correct.item() / float(points.size()[0]))
+                loss.backward()
+                optimizer.step()
+                global_step += 1
+
             
         scheduler.step()
 
         train_instance_acc = np.mean(mean_correct)
         tb.add_scalar('train_accuracy_per_epoch', train_instance_acc, epoch)
         tb.add_scalar('lr', optimizer.param_groups[0]["lr"], epoch)
-
 
         print ("Train Instance Accuracy: %f" % train_instance_acc)
 
